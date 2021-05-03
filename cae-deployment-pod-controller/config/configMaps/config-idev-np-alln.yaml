@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: xxxxx-config
+  namespace: xxxxx-infra
+data:
+  shard2vip.properties: |
+    xxxxx=xxxxxxxxx
+    
+  local.DC: xxxxxx

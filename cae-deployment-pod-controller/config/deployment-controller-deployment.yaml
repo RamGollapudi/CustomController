@@ -1,0 +1,71 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: os-deployment-controller
+  namespace: xxxx-infra
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: os-deployment-controller
+  template:
+    metadata:
+      labels:
+        app: os-deployment-controller
+        tier: xxx-control-plane
+    spec:
+      serviceAccountName: route-sa
+      containers:
+      - name: os-deployment-controller
+        image: "xxxxxxcustomcontrollerimagexxxx"
+        imagePullPolicy: Always
+        env:
+        - name: RESYNC_PERIOD
+          value: "300s"
+        - name: GLOBAL_RESYNC_PERIOD
+          value: "24h"
+        - name: WORKER_THREADS
+          value: "8"
+        - name: AM_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: am-api-secret
+              key: username
+        - name: AM_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: am-api-secret
+              key: password
+        - name: GSLB_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: gslb-api-secret
+              key: username
+        - name: GSLB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: gslb-api-secret
+              key: password
+        - name: SHARD2VIP_LOOKUP
+          valueFrom:
+            configMapKeyRef:
+              name: shard2vip-config
+              key: shard2vip.properties
+        - name: LOCAL_DC
+          valueFrom:
+            configMapKeyRef:
+              name: shard2vip-config
+              key: local.DC
+        - name: BLACKLIST_HOSTS
+          valueFrom:
+            configMapKeyRef:
+              name: blacklist-config
+              key: blacklist.properties
+      
+        resources:
+          requests:
+            cpu: 10m
+          limits:
+            memory: 1G
+
+
